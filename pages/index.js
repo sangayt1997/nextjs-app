@@ -23,13 +23,26 @@ function HomePage(props) {
     );
 }
 
+/*export async function getServerSideProps(context) {
+    const req = context.req;
+    const res = context.res;
+    // fetch data from an API
+    return {
+        props: {
+            meetups: DUMMY_MEETUPS
+        },
+    }
+}*/
+
 // calls during pre-rendering process before HomePage function called.
 export async function getStaticProps() {
     // fetch data from an API
     return {
         props: {
             meetups: DUMMY_MEETUPS
-        }
-    };
+        },
+        // regenerate the page after 1 seconds
+        revalidate: 1
+    }
 }
 export default HomePage;
