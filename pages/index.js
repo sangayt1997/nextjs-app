@@ -1,21 +1,5 @@
 import MeetupList from "../components/meetups/meetup-list/meetup-list";
-
-const DUMMY_MEETUPS = [
-    {
-        id: 'm1',
-        image: 'https://www.re-thinkingthefuture.com/wp-content/uploads/2021/08/A4877-10-biggest-waterparks-in-the-world-Image-16.jpg',
-        title: 'A first meetup',
-        address: 'Street 123, Singapore',
-        description: 'This is first meetup'
-    },
-    {
-        id: 'm2',
-        image: 'http://www.erholen-im-spreewald.de/wp-content/uploads/2017/07/TI_TROPINOCLUB-BUMPERBOATS6_RGB.jpg',
-        title: 'A second meetup',
-        address: 'Street 234, UK',
-        description: 'This is second meetup'
-    },
-];
+import { MongoClient } from "mongodb";
 
 function HomePage(props) {
     return (
@@ -37,12 +21,28 @@ function HomePage(props) {
 // calls during pre-rendering process before HomePage function called.
 export async function getStaticProps() {
     // fetch data from an API
+    const client = await MongoClient.connect(
+        'mongodb+srv://sangayt:8OnOOwWqDDrFwWq9@cluster0.gjdigvl.mongodb.net/meetup?retryWrites=true&w=majority'
+    );
+    const db = client.db();
+
+    const meetupsCollection = db.collection('meetups');
+    const meetups = await meetupsCollection.find().toArray();
+
+    client.close();
+
     return {
         props: {
-            meetups: DUMMY_MEETUPS
+            meetups: meetups.map(meetup => ({
+                id: meetup._id.toString(),
+                title: meetup.title,
+                address: meetup.address,
+                image: meetup.image
+            }))
         },
         // regenerate the page after 1 seconds
         revalidate: 1
     }
 }
+
 export default HomePage;
